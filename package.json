@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
+    "@apollo/client": "^3.0.0-beta.44",
     "@capacitor/android": "2.0.1",
     "@capacitor/core": "2.0.1",
     "@devexpress/dx-core": "^2.6.2",
@@ -23,6 +24,7 @@
     "axios": "^0.19.2",
     "eslint-config-airbnb": "^18.1.0",
     "eslint-plugin-react": "7.19.0",
+    "graphql": "^15.0.0",
     "immutable": "^4.0.0-rc.12",
     "ionicons": "^5.0.0",
     "node-sass": "^4.13.1",

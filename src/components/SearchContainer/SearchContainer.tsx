@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { IonCol, IonGrid, IonImg, IonRow } from '@ionic/react';
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { IonCol, IonGrid, IonRow } from '@ionic/react';
+import { useEffect, useState } from 'react';
 import axios, { AxiosResponse } from 'axios';
 import { env } from '../../react-env';
 import { enumModeList, enumModeOrder, enumTypeOrder } from '../Toolbar/ToolBar';
@@ -20,7 +20,10 @@ type MyProps = {
 
 const SearchContainer: React.FC<MyProps> = (props: MyProps) => {
 	const [content, setContent] = useState<Array<any>>([]);
-
+	const [
+		resultComponent,
+		setResultComponent,
+	] = useState<React.ReactElement | null>(null);
 	// Obtener datos
 	useEffect(() => {
 		const fetch = async () => {
@@ -38,7 +41,7 @@ const SearchContainer: React.FC<MyProps> = (props: MyProps) => {
 	}, [content.length, props.mode]);
 
 	// Ordenar Imagenes
-	useLayoutEffect(() => {
+	useEffect(() => {
 		if (content.length !== 0) {
 			// SortBy Name
 			if (props.modeTypeOrder === enumTypeOrder.Name) {
@@ -69,69 +72,66 @@ const SearchContainer: React.FC<MyProps> = (props: MyProps) => {
 		}
 	}, [props.modeList, props.modeOrder, props.modeTypeOrder]);
 
-	const sortContent = (method: (a: any, b: any) => number) => {
+	function sortContent(method: (a: any, b: any) => number) {
 		let sortedImages = content.slice().sort(method);
 		setContent(sortedImages);
-	};
+	}
 
 	const IonSize: string = props.modeList === enumModeList.Grid ? '6' : '12';
 
-	let Results = () => <p></p>;
-
-	if (props.mode === 'image') {
-		Results = () => (
-			<>
-				{content.map((item) => (
-					<IonCol size={IonSize} key={item.filename}>
-						<IonImg src={item.secure_url} />
-					</IonCol>
-				))}
-			</>
-		);
-	} else if (props.mode === 'video') {
-		Results = () => (
-			<>
-				{content.map((item) => (
-					<IonCol size={IonSize}>
-						<video
-							src={`${item.secure_url}#t=0.1`}
-							controls
-							preload={'metadata'}
-							width={'100%'}
-						/>
-					</IonCol>
-				))}
-			</>
-		);
-	} else if (props.mode === 'recent') {
-		Results = () => (
-			<>
-				{content.map((item) => {
-					console.log(':v');
-					return (
-						<IonCol key={item.filename} size={IonSize}>
-							{item.resource_type === 'image' ? (
-								<img src={item.secure_url} />
-							) : (
-								<video
-									width={'100%'}
-									controls
-									preload={'metadata'}
-									src={`${item.secure_url}#t=0.1`}
-								/>
-							)}
+	useEffect(() => {
+		if (props.mode === 'image') {
+			setResultComponent(() => (
+				<>
+					{content.map((item) => (
+						<IonCol size={IonSize} key={item.filename}>
+							<img src={item.secure_url} />
 						</IonCol>
-					);
-				})}
-			</>
-		);
-	}
+					))}
+				</>
+			));
+		} else if (props.mode === 'video') {
+			setResultComponent(() => (
+				<>
+					{content.map((item) => (
+						<IonCol size={IonSize} key={item.filename}>
+							<video
+								src={`${item.secure_url}#t=0.1`}
+								controls
+								preload={'metadata'}
+								width={'100%'}
+							/>
+						</IonCol>
+					))}
+				</>
+			));
+		} else if (props.mode === 'recent') {
+			setResultComponent(() => (
+				<>
+					{content.map((item) => {
+						return (
+							<IonCol key={item.filename} size={IonSize}>
+								{item.resource_type === 'image' ? (
+									<img src={item.secure_url} />
+								) : (
+									<video
+										width={'100%'}
+										controls
+										preload={'metadata'}
+										src={`${item.secure_url}#t=0.1`}
+									/>
+								)}
+							</IonCol>
+						);
+					})}
+				</>
+			));
+		}
+	}, [props.mode, content.length]);
 
 	return (
 		<IonGrid>
-			<IonRow>
-				<Results />
-			</IonRow>
+			<IonRow>{resultComponent}</IonRow>
 		</IonGrid>
 	);
 };
