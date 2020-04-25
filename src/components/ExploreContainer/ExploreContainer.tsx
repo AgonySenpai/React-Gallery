@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import './ExploreContainer.scss';
 import { IonGrid, IonLoading, IonRow } from '@ionic/react';
 import { connect } from 'react-redux';
@@ -35,11 +35,11 @@ const ExploreContainer: React.FC<MyProps> = (props: MyProps) => {
 	);
 	const [showLoading, setShowLoading] = useState(loading);
 
-	useEffect(() => {
+	useMemo(() => {
 		if (data) {
+			console.log(error);
 			setFolders(data.getFolders);
 			setShowLoading(false);
-			console.log(error);
 		}
 	}, [data]);
 

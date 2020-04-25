@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { IonGrid, IonLoading, IonRow } from '@ionic/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { enumModeList } from '../Toolbar/ToolBar';
 import {
 	getIconModeList,
@@ -12,6 +12,8 @@ import { useQuery } from '@apollo/client';
 import { Query } from '../../Utils/Query';
 import { sortArray } from '../../Utils/Sorter';
 import Media from '../Media/Media';
+import SearchComponent from './searchComponent';
+import { useParams } from 'react-router';
 
 type MyProps = {
 	modeList?: string;
@@ -21,28 +23,27 @@ type MyProps = {
 };
 
 const SearchContainer: React.FC<MyProps> = (props: MyProps) => {
+	const { mode } = useParams();
 	const [content, setContent] = useState<Array<any>>([]);
 	const { loading, data, error } = useQuery<{
 		searchContent: { resources: Array<any> };
 	}>(Query.searchContentQuery, {
 		variables: {
-			mode: props.mode,
+			mode,
 		},
 	});
 	const [showLoading, setShowLoading] = useState<boolean>(loading);
 
-	useEffect(() => {
-		if (data) {
-			console.log(error);
-			console.log(data);
-			setContent(data.searchContent.resources);
+	useMemo(() => {
+		if (data !== undefined) {
 			setShowLoading(false);
+			setContent(Array.from(data.searchContent.resources.slice()));
 		}
-	}, [data]);
+	}, [mode, data?.searchContent.resources.length]);
 
 	// Ordenar Imagenes
 	useEffect(() => {
-		if (content.length !== 0) {
+		if (content != null && content.length !== 0) {
 			setContent(sortArray(props.modeTypeOrder, props.modeOrder, content));
 		}
 	}, [props.modeList, props.modeOrder, props.modeTypeOrder, data]);
@@ -57,14 +58,16 @@ const SearchContainer: React.FC<MyProps> = (props: MyProps) => {
 			/>
 			<IonGrid>
 				<IonRow>
-					{content.map((item) => (
-						<Media
-							key={item.filename}
-							src={item.secure_url}
-							sizeCol={sizeCol}
-							type={item.resource_type}
-						/>
-					))}
+					{content.map((item) => {
+						return (
+							<Media
+								key={item.filename}
+								src={item.secure_url}
+								sizeCol={sizeCol}
+								type={item.resource_type}
+							/>
+						);
+					})}
 				</IonRow>
 			</IonGrid>
 		</>
