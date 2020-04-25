@@ -1,0 +1,46 @@
+.container {
+    text-align: center;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.container strong {
+    font-size: 20px;
+    line-height: 26px;
+}
+
+.container p {
+    font-size: 16px;
+    line-height: 22px;
+    color: #8c8c8c;
+    margin: 0;
+}
+
+.Folder {
+    //display: block;
+    ion-icon{
+        color: #737373;
+        zoom: 1.6;
+        vertical-align: middle;
+    }
+}
+
+.FolderItem{
+    border-radius: 5px;
+    border: none;
+    background-color: white;
+}
+
+ion-icon {
+    margin-right: 5px;
+}
+
+.wrapper{
+    padding-top: 20px;
+    background-color: #f7f7f7;
+    width: 100%;
+    height: 100%;
+}
