@@ -1,7 +1,6 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './ExploreContainer.scss';
 import { IonGrid, IonRow } from '@ionic/react';
-// eslint-disable-next-line no-unused-vars
 import axios, { AxiosResponse } from 'axios';
 import { connect } from 'react-redux';
 import { env } from '../../react-env';
@@ -11,7 +10,7 @@ import {
 	getTypeOrder,
 } from '../../Redux/ToolbarIcon/Reducer';
 import { enumModeList, enumModeOrder, enumTypeOrder } from '../Toolbar/ToolBar';
-import FolderComponent from '../ExploreContainer/Folder/Folder';
+import FolderComponent from './Folder/FolderComponent';
 
 type responseFolders = {
 	folders: Array<Folder>;
@@ -43,15 +42,12 @@ const ExploreContainer: React.FC<MyProps> = (props: MyProps) => {
 				);
 				if (response.data.folders) {
 					const foldersResponse = response.data.folders;
-					// for (let x = 0; x < foldersResponse.length; x++) {
-					// 	foldersResponse[x].id = x;
-					// }
 					setFolders(foldersResponse);
 				}
 			}
 		};
 		fetchData();
-	}, [props.modeOrder, props.modeList]);
+	}, [folders.length]);
 
 	// Ordenar Carpetas
 	useEffect(() => {
@@ -79,26 +75,36 @@ const ExploreContainer: React.FC<MyProps> = (props: MyProps) => {
 				}
 			}
 		}
-	}, [props.modeList, props.modeOrder, props.modeTypeOrder]);
+	}, [props.modeList, props.modeOrder, props.modeTypeOrder, folders.length]);
 
 	const sortFolders = (method: (a: Folder, b: Folder) => number) => {
 		let sortedFolders = folders.slice().sort(method);
 		setFolders(sortedFolders);
 	};
 
-	const IonSize = props.modeList === enumModeList.Grid ? '6' : '12';
 	return (
 		<IonGrid className='wrapper'>
 			<IonRow>
-				{folders.map((folder) => {
-					return (
-						<FolderComponent
-							key={folder.id}
-							sizeCol={IonSize}
-							name={folder.name}
-						/>
-					);
-				})}
+				{props.modeList === enumModeList.Grid
+					? folders.map((folder) => {
+							return (
+								<FolderComponent
+									key={folder.id}
+									sizeCol={'6'}
+									name={folder.name}
+								/>
+							);
+					  })
+					: folders.map((folder) => {
+							return (
+								<FolderComponent
+									key={folder.id}
+									sizeCol={'12'}
+									className={'GridExploreContainer'}
+									name={folder.name}
+								/>
+							);
+					  })}
 			</IonRow>
 		</IonGrid>
 	);

@@ -24,21 +24,23 @@ import '@ionic/react/css/display.css';
 import './theme/variables.css';
 import { Menu } from './components/Menu/Menu';
 import Folder from './pages/Folder/Folder';
+import SearchResult from './pages/SearchResult';
 
 const App: React.FC = () => {
-  return (
-    <IonApp>
-      <IonReactRouter>
-        <Menu>
-          <IonRouterOutlet id={'menu'}>
-            <Route path='/home' component={Home} exact={true} />
-            <Route path='/folder/:nameFolder' component={Folder} />
-            <Route exact path='/' render={() => <Redirect to='/home' />} />
-          </IonRouterOutlet>
-        </Menu>
-      </IonReactRouter>
-    </IonApp>
-  );
+	return (
+		<IonApp>
+			<IonReactRouter>
+				<Menu>
+					<IonRouterOutlet id={'menu'}>
+						<Route path={'/home'} component={Home} exact={true} />
+						<Route path={'/folder/:nameFolder'} component={Folder} />
+						<Route path={'/Search/:mode'} component={SearchResult} />
+						<Route exact path='/' render={() => <Redirect to='/home' />} />
+					</IonRouterOutlet>
+				</Menu>
+			</IonReactRouter>
+		</IonApp>
+	);
 };
 
 export default App;

@@ -5,13 +5,18 @@ import { folderOpen } from 'ionicons/icons';
 type MyProps = {
 	sizeCol: string;
 	name: string;
+	className?: string;
 };
 
-const Folder: React.FC<MyProps> = (props: MyProps) => {
-	const { sizeCol, name } = props;
+const FolderComponent: React.FC<MyProps> = (props: MyProps) => {
+	const { sizeCol, name, className } = props;
 	return (
 		<IonCol size={sizeCol}>
-			<IonItem href={`/Folder/${name}`} className='FolderItem' lines='full'>
+			<IonItem
+				href={`/Folder/${name}`}
+				className={`FolderItem ${className}`}
+				lines={'inset'}
+				mode={'ios'}>
 				<div className='Folder'>
 					<IonIcon icon={folderOpen} />
 					{name}
@@ -21,4 +26,4 @@ const Folder: React.FC<MyProps> = (props: MyProps) => {
 	);
 };
 
-export default Folder;
+export default FolderComponent;

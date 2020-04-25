@@ -82,7 +82,7 @@ const MyToolbar: React.FC<MyProps> = (props: MyProps) => {
 	};
 	return (
 		<>
-			<IonToolbar color='primary'>
+			<IonToolbar mode={'md'} color='primary'>
 				<IonButtons slot='start'>
 					<IonMenuButton
 						autoHide={false}
@@ -109,6 +109,7 @@ const MyToolbar: React.FC<MyProps> = (props: MyProps) => {
 				<IonPopover
 					translucent
 					animated
+					mode={'ios'}
 					event={popOverEvent}
 					isOpen={showPopOver}
 					onDidDismiss={() => togglePopOver(false, undefined)}>

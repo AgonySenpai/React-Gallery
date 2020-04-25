@@ -1,7 +1,7 @@
 import { IonContent, IonHeader, IonPage } from '@ionic/react';
 import React from 'react';
 import ExploreContainer from '../../components/ExploreContainer/ExploreContainer';
-import './Home.css';
+import './Home.scss';
 import { Toolbar } from '../../components/Toolbar/ToolBar';
 
 type Props = {};

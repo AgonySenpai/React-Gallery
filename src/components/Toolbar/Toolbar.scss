@@ -1,5 +1,6 @@
 .Mode{
   float: right;
+  background-color: #D1D1D1;
 }
 
 .float-right{
@@ -13,7 +14,8 @@
 ion-popover{
   ion-item{
     //margin-left: 0;
-    padding-left: 20px;
-    padding-right: 20px;
+    p{
+      padding-right: 20px;
+    }
   }
 }

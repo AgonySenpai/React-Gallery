@@ -76,10 +76,20 @@ const FolderContainer: React.FC<MyProps> = (props: MyProps) => {
 	return (
 		<IonGrid>
 			<IonRow>
-				{images.map((img) => {
+				{images.map((item) => {
 					return (
-						<IonCol size={IonSize} key={(img.version - img.bytes).toFixed(0)}>
-							<IonImg src={img.secure_url} />
+						<IonCol size={IonSize} key={(item.version - item.bytes).toFixed(0)}>
+							{item.resource_type === 'image' ? (
+								<IonImg src={item.secure_url} />
+							) : (
+								<video
+									src={`${item.secure_url}#t=0.1`}
+									controls
+									preload={'metadata'}
+									width={'100%'}
+									playsInline={true}
+								/>
+							)}
 						</IonCol>
 					);
 				})}

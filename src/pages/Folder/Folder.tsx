@@ -5,7 +5,6 @@ import {
 	IonInfiniteScroll,
 	IonPage,
 } from '@ionic/react';
-import axios from 'axios';
 import { Toolbar } from '../../components/Toolbar/ToolBar';
 import FolderContainer from '../../components/FolderContainer/FolderContainer';
 import { useParams } from 'react-router';
@@ -16,7 +15,7 @@ type MyProps = {
 	setImages: (Images: Array<any>) => void;
 };
 
-const Folder: React.FC<MyProps> = (props: MyProps) => {
+const Folder: React.FC<MyProps> = (_props: MyProps) => {
 	const { nameFolder } = useParams<{ nameFolder: string }>();
 	return (
 		<IonPage>

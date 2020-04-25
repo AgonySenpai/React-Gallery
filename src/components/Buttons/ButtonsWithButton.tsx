@@ -10,7 +10,7 @@ export const ButtonsWithButton: React.FC<MyProps> = (props: MyProps) => {
 	const { icon, onClick } = props;
 	return (
 		<IonButton onClick={onClick}>
-			<IonIcon icon={icon} />
+			<IonIcon icon={icon} mode={'ios'} />
 		</IonButton>
 	);
 };
