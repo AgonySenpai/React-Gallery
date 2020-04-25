@@ -1,8 +1,6 @@
 import * as React from 'react';
-import { IonCol, IonGrid, IonRow } from '@ionic/react';
+import { IonCol, IonGrid, IonLoading, IonRow } from '@ionic/react';
 import { useEffect, useState } from 'react';
-import axios, { AxiosResponse } from 'axios';
-import { env } from '../../react-env';
 import { enumModeList, enumModeOrder, enumTypeOrder } from '../Toolbar/ToolBar';
 import {
 	getIconModeList,
@@ -10,6 +8,8 @@ import {
 	getTypeOrder,
 } from '../../Redux/ToolbarIcon/Reducer';
 import { connect } from 'react-redux';
+import { useQuery } from '@apollo/client';
+import { Query } from '../../Utils/Query';
 
 type MyProps = {
 	modeList?: string;
@@ -24,21 +24,21 @@ const SearchContainer: React.FC<MyProps> = (props: MyProps) => {
 		resultComponent,
 		setResultComponent,
 	] = useState<React.ReactElement | null>(null);
-	// Obtener datos
+	const { loading, data, error } = useQuery<{
+		searchContent: { resources: Array<any> };
+	}>(Query.searchContentQuery, {
+		variables: {
+			mode: props.mode,
+		},
+	});
+	const [showLoading, setShowLoading] = useState<boolean>(loading);
+
 	useEffect(() => {
-		const fetch = async () => {
-			if (content.length === 0) {
-				const response: AxiosResponse<{
-					Content: { resources: Array<any> };
-				}> = await axios.get(`${env.urlSever}Find/${props.mode}`);
-				if (response.data.Content) {
-					const contentResponse = response.data.Content.resources;
-					setContent(contentResponse);
-				}
-			}
-		};
-		fetch();
-	}, [content.length, props.mode]);
+		if (data) {
+			setContent(data.searchContent.resources);
+			setShowLoading(false);
+		}
+	}, [data]);
 
 	// Ordenar Imagenes
 	useEffect(() => {
@@ -130,9 +130,16 @@ const SearchContainer: React.FC<MyProps> = (props: MyProps) => {
 	}, [props.mode, content.length]);
 
 	return (
-		<IonGrid>
-			<IonRow>{resultComponent}</IonRow>
-		</IonGrid>
+		<>
+			<IonLoading
+				isOpen={showLoading}
+				onDidDismiss={() => setShowLoading(false)}
+				message={'Please wait...'}
+			/>
+			<IonGrid>
+				<IonRow>{resultComponent}</IonRow>
+			</IonGrid>
+		</>
 	);
 };
 

@@ -9,6 +9,7 @@
     "@devexpress/dx-core": "^2.6.2",
     "@devexpress/dx-react-core": "^2.6.2",
     "@devexpress/dx-react-grid": "^2.6.2",
+    "@ionic/core": "^5.0.7",
     "@ionic/react": "^5.0.7",
     "@ionic/react-router": "^5.0.7",
     "@testing-library/jest-dom": "^4.2.4",
