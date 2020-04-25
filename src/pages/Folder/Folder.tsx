@@ -8,11 +8,8 @@ import {
 import { Toolbar } from '../../components/Toolbar/ToolBar';
 import FolderContainer from '../../components/FolderContainer/FolderContainer';
 import { useParams } from 'react-router';
-import { connect } from 'react-redux';
 
-type MyProps = {
-	setImages: (Images: Array<any>) => void;
-};
+type MyProps = {};
 
 const Folder: React.FC<MyProps> = (_props: MyProps) => {
 	const { nameFolder } = useParams<{ nameFolder: string }>();

@@ -1,15 +1,17 @@
 import * as React from 'react';
-import { IonCol, IonGrid, IonImg, IonRow } from '@ionic/react';
+import { IonGrid, IonLoading, IonRow } from '@ionic/react';
 import { connect } from 'react-redux';
-import { enumModeList, enumModeOrder, enumTypeOrder } from '../Toolbar/ToolBar';
+import { enumModeList } from '../Toolbar/ToolBar';
 import {
 	getIconModeList,
 	getIconModeOrder,
 	getTypeOrder,
 } from '../../Redux/ToolbarIcon/Reducer';
 import { useEffect, useLayoutEffect, useState } from 'react';
-import axios from 'axios';
-import { env } from '../../react-env';
+import { useQuery } from '@apollo/client';
+import { Query } from '../../Utils/Query';
+import { sortArray } from '../../Utils/Sorter';
+import Media from '../Media/Media';
 
 type MyProps = {
 	modeList: string;
@@ -20,81 +22,49 @@ type MyProps = {
 
 const FolderContainer: React.FC<MyProps> = (props: MyProps) => {
 	const [images, setImages] = useState<Array<any>>([]);
+	const { error, data, loading } = useQuery<{
+		searchImagesInFolder: { resources: Array<any> };
+	}>(Query.getFolderContent, {
+		variables: { folder: props.nameFolder },
+	});
+	const [showLoading, setShowLoading] = useState(loading);
 	useEffect(() => {
-		const fetch = async () => {
-			if (images.length === 0) {
-				const response = await axios.get(
-					`${env.urlSever}Images/${props.nameFolder}`,
-				);
-				if (response.data.Images) {
-					const { Images } = response.data;
-					setImages(Images);
-				}
-			}
-		};
-		fetch();
-	}, [props.modeOrder, props.modeTypeOrder, props.modeList]);
+		if (data) {
+			setImages(data.searchImagesInFolder.resources);
+			setShowLoading(false);
+		}
+		console.log(error);
+	}, [data]);
 
 	// Ordenar Imagenes
 	useLayoutEffect(() => {
 		if (images.length !== 0) {
-			// SortBy Name
-			if (props.modeTypeOrder === enumTypeOrder.Name) {
-				if (props.modeOrder === enumModeOrder.Desc) {
-					sortImages((a, b) => (a.filename < b.filename ? -1 : 1));
-				} else if (props.modeOrder === enumModeOrder.Asc) {
-					sortImages((a, b) => (b.filename < a.filename ? -1 : 1));
-				}
-				// SortBy Size
-			} else if (props.modeTypeOrder === enumTypeOrder.Size) {
-				if (props.modeOrder === enumModeOrder.Desc) {
-					sortImages((a, b) => b.bytes - a.bytes);
-				} else if (props.modeOrder === enumModeOrder.Asc) {
-					sortImages((a, b) => a.bytes - b.bytes);
-				}
-				// SortBy Modified
-			} else if (props.modeTypeOrder === enumTypeOrder.Modify) {
-				if (props.modeOrder === enumModeOrder.Desc) {
-					sortImages((a, b) =>
-						Date.parse(a.createdAt) < Date.parse(b.createdAt) ? -1 : 1,
-					);
-				} else if (props.modeOrder === enumModeOrder.Asc) {
-					sortImages((a, b) =>
-						Date.parse(b.createdAt) < Date.parse(a.createdAt) ? -1 : 1,
-					);
-				}
-			}
+			const { modeTypeOrder, modeOrder } = props;
+			setImages(sortArray(modeTypeOrder, modeOrder, images));
 		}
 	}, [props.modeList, props.modeOrder, props.modeTypeOrder]);
 
-	const sortImages = (method: (a: any, b: any) => number) => {
-		let sortedImages = images.slice().sort(method);
-		setImages(sortedImages);
-	};
-
-	const IonSize: string = props.modeList === enumModeList.Grid ? '6' : '12';
+	const IonSize: '6' | '12' = props.modeList === enumModeList.Grid ? '6' : '12';
 	return (
-		<IonGrid>
-			<IonRow>
-				{images.map((item) => {
-					return (
-						<IonCol size={IonSize} key={(item.version - item.bytes).toFixed(0)}>
-							{item.resource_type === 'image' ? (
-								<IonImg src={item.secure_url} />
-							) : (
-								<video
-									src={`${item.secure_url}#t=0.1`}
-									controls
-									preload={'metadata'}
-									width={'100%'}
-									playsInline={true}
-								/>
-							)}
-						</IonCol>
-					);
-				})}
-			</IonRow>
-		</IonGrid>
+		<>
+			<IonLoading
+				isOpen={showLoading}
+				onDidDismiss={() => setShowLoading(false)}
+				message={'Espere...'}
+			/>
+			<IonGrid>
+				<IonRow>
+					{images.map((item) => (
+						<Media
+							src={item.secure_url}
+							sizeCol={IonSize}
+							key={item.filename}
+							type={item.resource_type}
+						/>
+					))}
+				</IonRow>
+			</IonGrid>
+		</>
 	);
 };
 

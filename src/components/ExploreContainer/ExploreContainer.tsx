@@ -7,9 +7,11 @@ import {
 	getIconModeOrder,
 	getTypeOrder,
 } from '../../Redux/ToolbarIcon/Reducer';
-import { enumModeList, enumModeOrder, enumTypeOrder } from '../Toolbar/ToolBar';
+import { enumModeList } from '../Toolbar/ToolBar';
 import FolderComponent from './Folder/FolderComponent';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
+import { Query } from '../../Utils/Query';
+import { sortArray } from '../../Utils/Sorter';
 
 interface MyProps {
 	modeOrder?: string;
@@ -26,21 +28,10 @@ type Folder = {
 	size: number;
 };
 
-const FolderQuery = gql`
-	query {
-		getFolders {
-			id
-			name
-			createdAt
-			size
-		}
-	}
-`;
-
 const ExploreContainer: React.FC<MyProps> = (props: MyProps) => {
 	const [folders, setFolders] = useState<Array<Folder>>([]);
 	const { data, error, loading } = useQuery<{ getFolders: Array<Folder> }>(
-		FolderQuery,
+		Query.FolderQuery,
 	);
 	const [showLoading, setShowLoading] = useState(loading);
 
@@ -48,42 +39,19 @@ const ExploreContainer: React.FC<MyProps> = (props: MyProps) => {
 		if (data) {
 			setFolders(data.getFolders);
 			setShowLoading(false);
+			console.log(error);
 		}
 	}, [data]);
 
 	// Ordenar Carpetas
 	useEffect(() => {
 		if (folders.length !== 0) {
-			// SortBy Name
-			if (props.modeTypeOrder === enumTypeOrder.Name) {
-				if (props.modeOrder === enumModeOrder.Desc) {
-					sortFolders((a, b) => (a.name < b.name ? -1 : 1));
-				} else if (props.modeOrder === enumModeOrder.Asc) {
-					sortFolders((a, b) => (b.name < a.name ? -1 : 1));
-				}
-				// SortBy Size
-			} else if (props.modeTypeOrder === enumTypeOrder.Size) {
-				if (props.modeOrder === enumModeOrder.Desc) {
-					sortFolders((a, b) => b.size - a.size);
-				} else if (props.modeOrder === enumModeOrder.Asc) {
-					sortFolders((a, b) => a.size - b.size);
-				}
-				// SortBy Modified
-			} else if (props.modeTypeOrder === enumTypeOrder.Modify) {
-				if (props.modeOrder === enumModeOrder.Desc) {
-					sortFolders((a, b) => (a.createdAt < b.createdAt ? -1 : 1));
-				} else if (props.modeOrder === enumModeOrder.Asc) {
-					sortFolders((a, b) => (b.createdAt < a.createdAt ? -1 : 1));
-				}
-			}
+			const { modeOrder, modeTypeOrder } = props;
+			setFolders(sortArray(modeTypeOrder, modeOrder, folders, 'folders'));
 		}
 	}, [props.modeList, props.modeOrder, props.modeTypeOrder, folders.length]);
 
-	function sortFolders(method: (a: Folder, b: Folder) => number) {
-		let sortedFolders = folders.slice().sort(method);
-		setFolders(sortedFolders);
-	}
-
+	const sizeCol: '6' | '12' = props.modeList === enumModeList.Grid ? '6' : '12';
 	return (
 		<>
 			<IonLoading
@@ -93,26 +61,13 @@ const ExploreContainer: React.FC<MyProps> = (props: MyProps) => {
 			/>
 			<IonGrid className='wrapper'>
 				<IonRow>
-					{props.modeList === enumModeList.Grid
-						? folders.map((folder) => {
-								return (
-									<FolderComponent
-										key={folder.id}
-										sizeCol={'6'}
-										name={folder.name}
-									/>
-								);
-						  })
-						: folders.map((folder) => {
-								return (
-									<FolderComponent
-										key={folder.id}
-										sizeCol={'12'}
-										className={'GridExploreContainer'}
-										name={folder.name}
-									/>
-								);
-						  })}
+					{folders.map((folder) => (
+						<FolderComponent
+							key={folder.name}
+							name={folder.name}
+							sizeCol={sizeCol}
+						/>
+					))}
 				</IonRow>
 			</IonGrid>
 		</>
